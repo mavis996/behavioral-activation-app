@@ -382,7 +382,7 @@ V.opening = () => {
     <div class="art" aria-hidden="true">${SCENES[i % SCENES.length]}</div>
     <p class="msg">${esc(OPENINGS[i])}</p>
     <div class="stack">
-      <button class="btn btn-primary" data-act="accept">Accept</button>
+      <button class="btn btn-primary" data-act="accept">Start</button>
       <button class="btn btn-soft" data-go="home">Maybe later</button>
     </div>
   </div>`;
@@ -690,7 +690,7 @@ function startDraft(title) {
 const snapshot = steps => steps.map(s => ({ ...s }));
 
 const ACT = {
-  accept() { toast("Kept for you."); go("home"); },
+  accept() { go("home"); },
   how() { S.sheet = "how"; render(); },
   closeSheet() { S.sheet = null; render(); },
   support() { S.supportReason = null; S.from = S.view; go("support"); },
