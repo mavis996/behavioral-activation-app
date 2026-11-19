@@ -1,4 +1,4 @@
-<title>Tiny Yes</title>
+<title>Small Steps Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&family=Young+Serif&display=swap">
 <style>
@@ -45,7 +45,7 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
 
 /* Top bar */
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 4px; }
-.brand { font-family: var(--display); font-size: 19px; color: var(--leaf); letter-spacing: .01em; }
+.brand { display: inline-flex; color: var(--leaf); }
 .topbar .right { display: flex; gap: 8px; align-items: center; }
 .help-pill { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; background: var(--sand); color: var(--ink); font-size: 14px; font-weight: 500; }
 .help-pill svg { width: 16px; height: 16px; color: var(--clay); }
@@ -364,7 +364,7 @@ function toast(msg) {
 }
 function go(view) { S.view = view; S.sheet = null; render(); const sc = $app.querySelector(".screen"); if (sc) sc.scrollTop = 0; }
 const helpPill = `<button class="help-pill" data-act="support">${I.heart}Need help now?</button>`;
-const topbar = (extra = "") => `<div class="topbar"><span class="brand">Tiny Yes</span><div class="right">${extra}${helpPill}</div></div>`;
+const topbar = (extra = "") => `<div class="topbar"><span class="brand"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 4C9 4 5 9 5 15c0 1.5.4 3 1 4l1.2-1.2C9 13 12.5 10 16 9c-3 1.8-6 5-7.6 9.6C9.4 19.5 10.7 20 12 20c6 0 8-7 7-16z"/></svg></span><div class="right">${extra}${helpPill}</div></div>`;
 const face = (i, size = 40) => {
   const curve = 26 + (i - 2) * 3.2;
   const tint = ["var(--line)", "var(--sand)", "var(--sand)", "var(--leaf-soft)", "var(--leaf-soft)"][i];
@@ -406,7 +406,7 @@ V.home = () => {
       <p class="label">Things you did today</p>
       <ul class="done-list">${S.doneLog.map(d => `<li>${I.leaf}<span>${esc(d.text)}</span></li>`).join("")}</ul>
     </section>` : "";
-  return topbar(`<button class="icon-btn" data-act="how" aria-label="How Tiny Yes works">?</button>`) +
+  return topbar(`<button class="icon-btn" data-act="how" aria-label="How this app works">?</button>`) +
     `<div class="screen">${body}${done}</div>`;
 };
 
@@ -580,7 +580,7 @@ V.settings = () => {
 
     <section class="card set-group">
       <h2>Learning</h2>
-      <div class="toggle-row"><div><p>Let Tiny Yes learn from your tasks and mood to make better suggestions?</p></div>
+      <div class="toggle-row"><div><p>Let the app learn from your tasks and mood to make better suggestions?</p></div>
         <button class="switch" role="switch" aria-checked="${st.tracking}" aria-label="Learning from tasks and mood" data-act="toggle" data-k="tracking"></button></div>
       <p class="small muted">It notes when you do things and how you felt. It stays private on your phone.</p>
       ${st.tracking ? `<div class="helps fade-in"><span class="label">What helps you</span>${helps}</div>` : ""}
@@ -612,10 +612,10 @@ V.notifs = () => `<div class="screen">
   <div class="seg">${Object.keys(TONES).map(t => `<button aria-pressed="${S.settings.tone === t}" data-act="tone" data-t="${t}">${t}</button>`).join("")}</div>
   <div class="lock">
     <div class="time">10:24</div>
-    ${TONES[S.settings.tone].map((m, i) => `<div class="notif"><div class="ic">t</div><div style="flex:1;min-width:0"><div class="meta"><b>Tiny Yes</b><span>${["now","1h ago","3h ago"][i]}</span></div><p>${m}</p></div></div>`).join("")}
+    ${TONES[S.settings.tone].map((m, i) => `<div class="notif"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 4C9 4 5 9 5 15c0 1.5.4 3 1 4l1.2-1.2C9 13 12.5 10 16 9c-3 1.8-6 5-7.6 9.6C9.4 19.5 10.7 20 12 20c6 0 8-7 7-16z"/></svg></div><div style="flex:1;min-width:0"><div class="meta"><b>Reminder</b><span>${["now","1h ago","3h ago"][i]}</span></div><p>${m}</p></div></div>`).join("")}
   </div>
   <section class="card" style="gap:10px">
-    <p class="label">Tiny Yes never sends</p>
+    <p class="label">This app never sends</p>
     <ul class="never"><li>You haven't done anything today</li><li>Don't break your streak</li><li>You missed yesterday</li></ul>
   </section>
 </div>`;
@@ -641,8 +641,8 @@ V.support = () => {
 
 /* Sheets */
 function sheetHTML() {
-  if (S.sheet === "how") return `<div class="sheet-bg" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="How Tiny Yes works">
-    <h2>How Tiny Yes works</h2>
+  if (S.sheet === "how") return `<div class="sheet-bg" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="How this app works">
+    <h2>How this app works</h2>
     <ul class="how"><li><span>1</span>Pick one small thing you'd like to do.</li><li><span>2</span>We break it into tiny steps. Make them smaller anytime.</li><li><span>3</span>Do one step if you want. That counts.</li></ul>
     <button class="btn btn-primary" data-act="closeSheet">Okay</button></div></div>`;
   if (S.sheet === "newArt") return `<div class="sheet-bg" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="Start a new artwork">

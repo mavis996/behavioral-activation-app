@@ -1,4 +1,6 @@
-# Tiny Yes
+# Behavioral activation app (prototype)
+
+_Name not decided yet._
 
 A clickable, mobile-first prototype of a gentle behavioral-activation app. It helps people with low energy do everyday things by breaking tasks into very small steps.
 
