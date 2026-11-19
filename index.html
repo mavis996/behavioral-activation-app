@@ -1,0 +1,817 @@
+<title>Tiny Yes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&family=Young+Serif&display=swap">
+<style>
+/* Layout: one phone-sized app shell, centered on wide screens; one main thing per screen, bottom nav on the three home screens. */
+:root {
+  --bg: #e6efe0;        /* light sage ground */
+  --surface: #f8f9f2;   /* soft paper for cards */
+  --ink: #2e392d;       /* deep moss text */
+  --muted: #687262;     /* quiet secondary text */
+  --leaf: #587a52;      /* primary action green */
+  --on-leaf: #fbfcf6;
+  --leaf-soft: #cfe0c5; /* pale leaf tint */
+  --clay: #a87b52;      /* warm earth accent */
+  --sand: #efe5d2;      /* warm sand tint */
+  --line: #d2ddc9;
+  --shadow: 0 1px 2px rgba(46,57,45,.06), 0 8px 24px rgba(46,57,45,.07);
+  --display: "Young Serif", Georgia, "Times New Roman", serif;
+  --body: "Lexend", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  --r-lg: 28px; --r-md: 20px; --r-sm: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #19201a; --surface: #222b22; --ink: #e4ebdc; --muted: #a2ad99; --leaf: #9ec391; --on-leaf: #142014;
+  --leaf-soft: #2e3e2b; --clay: #d3a97c; --sand: #39322a; --line: #33402f; --shadow: 0 1px 2px rgba(0,0,0,.25), 0 8px 24px rgba(0,0,0,.25);
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #19201a; --surface: #222b22; --ink: #e4ebdc; --muted: #a2ad99; --leaf: #9ec391; --on-leaf: #142014;
+  --leaf-soft: #2e3e2b; --clay: #d3a97c; --sand: #39322a; --line: #33402f; --shadow: 0 1px 2px rgba(0,0,0,.25), 0 8px 24px rgba(0,0,0,.25);
+  color-scheme: dark; }
+
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; font-weight: 400; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+:focus-visible { outline: 3px solid var(--clay); outline-offset: 3px; border-radius: 12px; }
+
+.shell { position: relative; height: 100%; max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
+@media (min-width: 560px) and (min-height: 700px) {
+  body { display: grid; place-items: center; padding-block: 24px; }
+  .shell { height: min(844px, 100%); width: 390px; border-radius: 40px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+}
+.screen { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px 22px 28px; display: flex; flex-direction: column; gap: 20px; }
+.screen.center { justify-content: center; }
+
+/* Top bar */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 4px; }
+.brand { font-family: var(--display); font-size: 19px; color: var(--leaf); letter-spacing: .01em; }
+.topbar .right { display: flex; gap: 8px; align-items: center; }
+.help-pill { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; background: var(--sand); color: var(--ink); font-size: 14px; font-weight: 500; }
+.help-pill svg { width: 16px; height: 16px; color: var(--clay); }
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--line); color: var(--muted); font-weight: 600; }
+.back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 15px; padding: 8px 4px; align-self: flex-start; }
+
+h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; line-height: 1.2; }
+h1 { font-size: 28px; }
+h2 { font-size: 22px; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+
+/* Buttons */
+.btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 58px; padding: 14px 24px; border-radius: 999px; font-size: 18px; font-weight: 500; width: 100%; transition: transform .15s ease, background .2s; }
+.btn:active { transform: scale(.98); }
+.btn-primary { background: var(--leaf); color: var(--on-leaf); }
+.btn-soft { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.btn-earth { background: var(--clay); color: var(--on-leaf); }
+.link { color: var(--muted); font-size: 15px; text-decoration: underline; text-underline-offset: 3px; padding: 10px; align-self: center; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+
+/* Cards */
+.card { background: var(--surface); border-radius: var(--r-lg); padding: 22px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; }
+.task-title { font-family: var(--display); font-size: 21px; text-align: left; line-height: 1.25; }
+.next-step { background: var(--leaf-soft); border-radius: var(--r-md); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+.next-step .text { font-size: 20px; font-weight: 500; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.row.split { justify-content: space-between; }
+.quiet-links { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.quiet-links .link { padding: 6px 2px; font-size: 14px; }
+.chip { padding: 10px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 15px; }
+.chip[aria-pressed="true"] { background: var(--leaf-soft); border-color: var(--leaf); color: var(--ink); font-weight: 500; }
+.chip:disabled { opacity: .5; cursor: default; }
+
+/* Done list */
+.done-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.done-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+.done-list li svg { flex: none; width: 18px; height: 18px; margin-top: 3px; color: var(--leaf); }
+
+/* Empty */
+.empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 22px; padding: 20px 0; }
+.plus-big { width: 112px; height: 112px; border-radius: 50%; background: var(--leaf); color: var(--on-leaf); display: grid; place-items: center; box-shadow: var(--shadow); }
+.plus-big svg { width: 44px; height: 44px; }
+
+/* Opening */
+.opening { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 28px 24px 24px; gap: 24px; background: linear-gradient(180deg, var(--leaf-soft) 0%, var(--bg) 62%); }
+.opening .art { flex: 1; display: grid; place-items: center; min-height: 160px; }
+.opening .art svg { width: min(240px, 70%); height: auto; animation: breathe 6s ease-in-out infinite; }
+.opening .msg { font-family: var(--display); font-size: 30px; line-height: 1.22; text-wrap: balance; }
+.welcome { font-size: 16px; color: var(--leaf); font-weight: 500; }
+@keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+.fade-in { animation: fade .5s ease both; }
+@keyframes fade { from { opacity: .001; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Add */
+.text-in { width: 100%; padding: 18px 20px; border-radius: var(--r-md); border: 1.5px solid var(--line); background: var(--surface); font-size: 19px; }
+.text-in:focus { outline: none; border-color: var(--leaf); }
+.mic-big { width: 128px; height: 128px; border-radius: 50%; background: var(--sand); color: var(--clay); display: grid; place-items: center; align-self: center; border: 1px solid var(--line); }
+.mic-big svg { width: 48px; height: 48px; }
+.or { text-align: center; color: var(--muted); font-size: 14px; }
+.suggest { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Voice */
+.voice { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center; padding: 40px 24px 32px; background: var(--leaf-soft); gap: 24px; }
+.wave { display: flex; align-items: center; gap: 7px; height: 110px; }
+.wave span { width: 9px; border-radius: 9px; background: var(--leaf); height: 20%; animation: wave 1.1s ease-in-out infinite; }
+@keyframes wave { 0%,100% { height: 18%; } 50% { height: 95%; } }
+.transcript { font-family: var(--display); font-size: 28px; min-height: 2.6em; display: grid; place-items: center; }
+.arrow-btn { width: 84px; height: 84px; border-radius: 50%; background: var(--leaf); color: var(--on-leaf); display: grid; place-items: center; box-shadow: var(--shadow); }
+.arrow-btn svg { width: 34px; height: 34px; }
+
+/* Split */
+.orig { background: var(--sand); border-radius: var(--r-md); padding: 16px 18px; }
+.orig .t { font-family: var(--display); font-size: 24px; line-height: 1.2; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.step { background: var(--surface); border-radius: var(--r-md); border: 1px solid var(--line); }
+.step-main { display: flex; align-items: center; gap: 12px; padding: 10px 8px 10px 12px; min-height: 60px; }
+.check { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--leaf); display: grid; place-items: center; color: var(--on-leaf); }
+.check svg { width: 20px; height: 20px; opacity: 0; }
+.step.done .check { background: var(--leaf); }
+.step.done .check svg { opacity: 1; }
+.step .st { flex: 1; min-width: 0; font-size: 17px; }
+.step.done .st { color: var(--muted); }
+.more { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); }
+.step-actions { display: flex; gap: 6px; padding: 0 10px 12px 60px; flex-wrap: wrap; }
+.step-actions button { font-size: 14px; padding: 8px 12px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.edit-in { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--leaf); background: var(--bg); font-size: 17px; }
+.fresh { animation: fresh .6s ease both; }
+@keyframes fresh { from { background: var(--leaf-soft); transform: translateX(-4px); } to { background: var(--surface); transform: none; } }
+.smaller { min-height: 72px; font-size: 22px; letter-spacing: .04em; font-weight: 600; background: var(--clay); color: var(--on-leaf); }
+.smaller svg { width: 26px; height: 26px; }
+.ai-note { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--muted); }
+.ai-note svg { flex: none; width: 18px; height: 18px; margin-top: 2px; color: var(--clay); }
+.thinking { display: flex; flex-direction: column; gap: 10px; }
+.thinking div { height: 60px; border-radius: var(--r-md); background: linear-gradient(90deg, var(--surface), var(--leaf-soft), var(--surface)); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* After */
+.after-hero { display: grid; place-items: center; }
+.after-hero svg { width: 120px; height: 120px; }
+.faces { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.face { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 2px; border-radius: var(--r-sm); }
+.face svg { width: 52px; height: 52px; }
+.face[aria-pressed="true"] { background: var(--leaf-soft); }
+.face-labels { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+
+/* Gallery */
+.canvas-wrap { background: var(--surface); border-radius: var(--r-lg); padding: 14px; box-shadow: var(--shadow); }
+.pixels { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; aspect-ratio: 1; max-width: 100%; }
+.px { border-radius: 4px; border: 1px dashed var(--line); background: transparent; aspect-ratio: 1; }
+.px.on { border: 0; }
+.px.pop { animation: pop .5s cubic-bezier(.3,1.6,.5,1) both; }
+@keyframes pop { from { transform: scale(.2); } to { transform: scale(1); } }
+.px-count { display: flex; align-items: center; gap: 10px; background: var(--sand); padding: 14px 16px; border-radius: var(--r-md); font-size: 15px; }
+.px-count .dot { width: 14px; height: 14px; border-radius: 4px; background: var(--clay); flex: none; }
+.collection { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.thumb { display: flex; flex-direction: column; gap: 6px; font-size: 13px; text-align: center; color: var(--muted); }
+.thumb canvas { width: 100%; aspect-ratio: 1; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); image-rendering: pixelated; }
+.thumb.current canvas { border: 2px solid var(--leaf); }
+
+/* Settings */
+.set-group { display: flex; flex-direction: column; gap: 14px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.toggle-row > div { min-width: 0; }
+.switch { flex: none; width: 58px; height: 34px; border-radius: 999px; background: var(--line); position: relative; transition: background .2s; }
+.switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 26px; height: 26px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .2s; }
+.switch[aria-checked="true"] { background: var(--leaf); }
+.switch[aria-checked="true"]::after { transform: translateX(24px); }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--bg); padding: 4px; border-radius: 16px; }
+.seg button { padding: 10px 6px; border-radius: 12px; font-size: 14px; line-height: 1.25; }
+.seg button[aria-pressed="true"] { background: var(--surface); box-shadow: var(--shadow); font-weight: 500; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); }
+.field input { padding: 14px 16px; border-radius: var(--r-sm); border: 1.5px solid var(--line); background: var(--bg); font-size: 16px; color: var(--ink); }
+.field input:focus { outline: none; border-color: var(--leaf); }
+.helps { background: var(--leaf-soft); border-radius: var(--r-md); padding: 18px; display: flex; flex-direction: column; gap: 6px; }
+.helps .big { font-family: var(--display); font-size: 19px; line-height: 1.3; }
+
+/* Notifications preview */
+.lock { background: linear-gradient(170deg, #6f8f68, #a98a63); border-radius: var(--r-lg); padding: 28px 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.lock .time { text-align: center; color: #fbf8ef; font-family: var(--display); font-size: 48px; line-height: 1; margin-bottom: 14px; }
+.notif { background: rgba(251,249,242,.88); color: #2e392d; border-radius: 18px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; }
+.notif .ic { flex: none; width: 34px; height: 34px; border-radius: 9px; background: #587a52; display: grid; place-items: center; color: #fbfcf6; font-family: var(--display); font-size: 16px; }
+.notif .meta { font-size: 12px; color: #687262; display: flex; justify-content: space-between; gap: 8px; }
+.notif p { font-size: 15px; line-height: 1.35; }
+.never { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--muted); }
+.never li { text-decoration: line-through; text-decoration-color: var(--clay); }
+
+/* Support */
+.support-card { background: var(--surface); border-radius: var(--r-md); padding: 18px; display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); }
+.support-card .num { font-size: 26px; font-weight: 600; color: var(--leaf); user-select: all; font-variant-numeric: tabular-nums; }
+.support-card a { color: var(--leaf); }
+
+/* Nav */
+.nav { display: grid; grid-template-columns: repeat(3, 1fr); padding: 8px 12px 10px; background: var(--surface); border-top: 1px solid var(--line); }
+.nav[hidden] { display: none; }
+.nav button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; font-size: 13px; color: var(--muted); border-radius: 14px; }
+.nav button svg { width: 24px; height: 24px; }
+.nav button[aria-current="page"] { color: var(--leaf); font-weight: 500; }
+.nav button[aria-current="page"] svg { fill: var(--leaf-soft); }
+
+/* Overlay sheet */
+.sheet-bg { position: absolute; inset: 0; background: rgba(30,40,30,.35); display: flex; align-items: flex-end; z-index: 20; animation: fade .25s ease both; }
+.sheet { width: 100%; background: var(--surface); border-radius: 28px 28px 0 0; padding: 26px 24px 28px; display: flex; flex-direction: column; gap: 16px; }
+.how { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.how li { display: flex; gap: 14px; align-items: flex-start; font-size: 17px; }
+.how li span { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--leaf-soft); color: var(--leaf); display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+
+.toast { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 12px 20px; border-radius: 999px; font-size: 15px; z-index: 30; max-width: calc(100% - 40px); text-align: center; animation: fade .3s ease both; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="shell" id="shell">
+  <div id="app" style="flex:1; display:flex; flex-direction:column; min-height:0;"></div>
+  <nav class="nav" id="nav" aria-label="Main" hidden>
+    <button data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg>Home</button>
+    <button data-go="gallery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>Gallery</button>
+    <button data-go="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 7h8M17 7h2M5 17h2M11 17h8"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Settings</button>
+  </nav>
+</div>
+
+<script>
+/* ---------- Icons ---------- */
+const I = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  back: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  dots: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  leaf: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4C9 4 5 9 5 15c0 1.5.4 3 1 4l1.2-1.2C9 13 12.5 10 16 9c-3 1.8-6 5-7.6 9.6C9.4 19.5 10.7 20 12 20c6 0 8-7 7-16z"/></svg>',
+  spark: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6z"/></svg>',
+  shrink: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5"/></svg>',
+};
+
+/* Calm opening scenes */
+const SCENES = [
+  `<svg viewBox="0 0 200 160"><circle cx="138" cy="52" r="26" style="fill:var(--sand)"/><circle cx="138" cy="52" r="17" style="fill:var(--clay);opacity:.55"/><path d="M0 120 Q50 80 100 110 T200 100 V160 H0z" style="fill:var(--leaf-soft)"/><path d="M0 138 Q60 112 120 132 T200 128 V160 H0z" style="fill:var(--leaf);opacity:.55"/></svg>`,
+  `<svg viewBox="0 0 200 160"><ellipse cx="100" cy="140" rx="62" ry="8" style="fill:var(--leaf-soft)"/><path d="M100 136 C100 100 98 80 100 52" style="stroke:var(--leaf);stroke-width:4;fill:none;stroke-linecap:round"/><path d="M100 92 C76 92 64 76 62 58 C84 58 98 70 100 92z" style="fill:var(--leaf)"/><path d="M100 76 C122 76 136 62 138 42 C116 42 102 54 100 76z" style="fill:var(--leaf);opacity:.7"/><circle cx="100" cy="46" r="7" style="fill:var(--clay)"/></svg>`,
+  `<svg viewBox="0 0 200 160"><path d="M90 40 q-8 -12 0 -24 M110 40 q-8 -12 0 -24" style="stroke:var(--leaf);stroke-width:3;fill:none;stroke-linecap:round;opacity:.6"/><path d="M58 58 H142 V100 a30 30 0 0 1 -30 30 H88 a30 30 0 0 1 -30 -30z" style="fill:var(--clay);opacity:.8"/><path d="M142 70 h8 a14 14 0 0 1 0 28 h-10" style="stroke:var(--clay);stroke-width:7;fill:none;opacity:.8"/><ellipse cx="100" cy="138" rx="66" ry="7" style="fill:var(--leaf-soft)"/></svg>`,
+];
+const OPENINGS = [
+  "You opened the app. That's a real step.",
+  "Here's a little something for today: you don't have to do it all.",
+  "Small is still something.",
+  "Rest counts too.",
+  "Whatever today looks like, you're welcome here.",
+  "One tiny thing is plenty.",
+];
+
+/* ---------- Mock "AI" splitter ---------- */
+const TASKS = [
+  { k: /walk|outside|fresh air/i, steps: ["Get out of bed", "Put on a sweater", "Put on shoes", "Go out the door"] },
+  { k: /water|drink/i, steps: ["Find a cup", "Fill it with water", "Take one sip"] },
+  { k: /shower|bath|wash/i, steps: ["Walk to the bathroom", "Turn on the water", "Step in", "Let the water run over you"] },
+  { k: /eat|food|breakfast|lunch|dinner|snack/i, steps: ["Go to the kitchen", "Pick one easy food", "Take one bite"] },
+  { k: /teeth|brush/i, steps: ["Walk to the sink", "Put toothpaste on the brush", "Brush your front teeth"] },
+  { k: /message|text|reply|email|call/i, steps: ["Pick up your phone", "Open the message", "Type one short line", "Press send"] },
+  { k: /tidy|clean|dishes|laundry/i, steps: ["Pick one spot", "Pick up one thing", "Put it where it goes"] },
+];
+const GENERIC = ["Find a comfy spot", "Get one thing you need", "Do one tiny part of it"];
+const SMALLER = {
+  "Get out of bed": ["Sit up", "Put your feet on the floor", "Stand up"],
+  "Sit up": ["Open your eyes", "Roll onto your side", "Push up with your arm"],
+  "Stand up": ["Lean forward a little", "Push up with your legs"],
+  "Put on a sweater": ["Find your sweater", "Pick it up", "Put one arm in", "Put the other arm in"],
+  "Put on shoes": ["Find your shoes", "Sit down near them", "Put on one shoe", "Put on the other shoe"],
+  "Go out the door": ["Walk to the door", "Put your hand on the handle", "Open the door", "Take one step outside"],
+  "Find a cup": ["Walk to the kitchen", "Open the cupboard", "Pick up a cup"],
+  "Fill it with water": ["Hold the cup under the tap", "Turn the tap on", "Turn the tap off"],
+  "Take one sip": ["Lift the cup", "Take one small sip"],
+  "Walk to the bathroom": ["Stand up", "Walk to the bathroom door", "Step inside"],
+  "Turn on the water": ["Reach for the handle", "Turn it a little", "Feel if it's warm"],
+  "Step in": ["Take off your clothes", "Step into the shower"],
+  "Go to the kitchen": ["Stand up", "Walk to the kitchen"],
+  "Walk to the kitchen": ["Stand up", "Take a few steps"],
+  "Pick one easy food": ["Open the fridge or cupboard", "Look for one easy thing", "Take it out"],
+  "Take one bite": ["Open it", "Take one bite"],
+  "Walk to the sink": ["Stand up", "Walk to the sink"],
+  "Put toothpaste on the brush": ["Pick up your toothbrush", "Open the toothpaste", "Squeeze a little on"],
+  "Pick up your phone": ["Reach for your phone", "Unlock it"],
+  "Open the message": ["Find the app", "Tap the message"],
+  "Type one short line": ["Tap the text box", "Type one word", "Type a few more words"],
+  "Pick one spot": ["Look around", "Choose the smallest spot"],
+  "Pick up one thing": ["Walk over to it", "Reach for one thing"],
+  "Find a comfy spot": ["Look around", "Sit or stand there"],
+  "Get one thing you need": ["Think of one thing you need", "Go and get it"],
+  "Do one tiny part of it": ["Pick the very first bit", "Do just that bit"],
+  "Find your shoes": ["Look near the door", "Pick them up"],
+};
+const ALTS = {
+  "Get out of bed": "Sit up in bed", "Put on a sweater": "Grab any top that's close", "Put on shoes": "Slip on any shoes",
+  "Go out the door": "Open a window instead", "Find a cup": "Use any bottle you have", "Step in": "Wash your face at the sink",
+  "Take one bite": "Have a few sips of juice", "Type one short line": "Send one emoji", "Pick up one thing": "Move one thing a little",
+};
+const GENERIC_ALTS = ["Do just a tiny part of it", "Try it sitting down", "Do it in your own way"];
+const CRISIS = /suicid|kill myself|end my life|self[- ]?harm|hurt myself|cut myself|want to die|don'?t want to live/i;
+
+let uid = 1;
+const mk = (text, extra = {}) => ({ id: uid++, text, done: false, ...extra });
+function splitTask(title) {
+  const hit = TASKS.find(t => t.k.test(title));
+  return (hit ? hit.steps : GENERIC).map(s => mk(s));
+}
+function smallerOf(step) {
+  if (step.done || step.atom) return null;
+  if (SMALLER[step.text]) return SMALLER[step.text].map(s => mk(s, { fresh: true }));
+  return [mk("Take one slow breath", { atom: true, fresh: true }), mk(step.text, { atom: true, fresh: true })];
+}
+
+/* ---------- Pixel artworks (12×12) ---------- */
+const COLORS = { a:"#bcd7d2", b:"#e8c46e", c:"#93b47d", d:"#5f8a5a", e:"#9b7653", f:"#d99a8b", g:"#7ea56b", h:"#f1e5cc", k:"#3f3730", o:"#d6975a", p:"#d08b84", w:"#f8f2e6", y:"#ecd27d" };
+const PICTURES = {
+  garden: { name: "Little garden", rows: [
+    "aaaaabbaaaaa","aaaaabbaaaaa","aafaaaaaaafa","afyfaaaaafyf","aagaaafaaaga","aagaafyfaaga",
+    "agggaafaaggg","aagaaagaaaga","gggggggggggg","gdgdgdgdgdgd","eeeeeeeeeeee","eeeeeheeeeee"] },
+  hills: { name: "Quiet hills", rows: [
+    "aaaaaaaaaaaa","aaaaaaaabbaa","aaaaaaabbbba","aaaaaaabbbba","aaaaaaaabbaa","aaaaccaaaaaa",
+    "aaacccccaaaa","acccccccccaa","ccccdddccccc","cddddddddccc","ddddeedddddd","ddddeeeedddd"] },
+  cat: { name: "Sleepy cat", rows: [
+    "hhhhhhhhhhhh","hhohhhhhhohh","hhoohhhhoohh","hhoooooooohh","hhokooookohh","hhoooppooohh",
+    "hhhoooooohhh","hhoooooooohh","hoooowwooooh","hoooowwooooh","hooooooooooh","gggggggggggg"] },
+};
+const cellColor = (key, i) => COLORS[PICTURES[key].rows[Math.floor(i / 12)][i % 12]];
+
+/* ---------- State (in memory) ---------- */
+const S = {
+  view: "opening", opens: 0, openIdx: Math.floor(Math.random() * OPENINGS.length),
+  tasks: [{ id: uid++, title: "Drink some water", suggested: true, steps: splitTask("water"), history: [] }],
+  doneLog: [], moods: [], pixels: 0,
+  art: { key: "garden", placed: new Set() },
+  collection: [{ key: "hills", placed: new Set([...Array(144).keys()]) }],
+  settings: { notif: true, times: ["Midday"], tone: "Gentle", tracking: false, contactName: "Sam", contactPhone: "(555) 012-3456" },
+  draft: null, openStep: null, editStep: null, last: null, afterStage: "mood", mood: null, sheet: null, voiceText: "", thinking: false,
+  supportReason: null, justPlaced: new Set(), from: "home",
+};
+// Seed the current artwork from the ground up so it already looks alive.
+for (let i = 96; i < 144; i++) S.art.placed.add(i);
+[30, 31, 62, 69, 74, 75, 80, 81, 84, 91].forEach(i => S.art.placed.add(i));
+
+/* ---------- Helpers ---------- */
+const $app = document.getElementById("app");
+const $nav = document.getElementById("nav");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const lower1 = s => s.charAt(0).toLowerCase() + s.slice(1);
+let toastTimer;
+function toast(msg) {
+  document.querySelectorAll(".toast").forEach(t => t.remove());
+  const t = document.createElement("div");
+  t.className = "toast"; t.setAttribute("role", "status"); t.textContent = msg;
+  document.getElementById("shell").appendChild(t);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.remove(), 2400);
+}
+function go(view) { S.view = view; S.sheet = null; render(); const sc = $app.querySelector(".screen"); if (sc) sc.scrollTop = 0; }
+const helpPill = `<button class="help-pill" data-act="support">${I.heart}Need help now?</button>`;
+const topbar = (extra = "") => `<div class="topbar"><span class="brand">Tiny Yes</span><div class="right">${extra}${helpPill}</div></div>`;
+const face = (i, size = 40) => {
+  const curve = 26 + (i - 2) * 3.2;
+  const tint = ["var(--line)", "var(--sand)", "var(--sand)", "var(--leaf-soft)", "var(--leaf-soft)"][i];
+  return `<svg viewBox="0 0 40 40" width="${size}" height="${size}"><circle cx="20" cy="20" r="18" style="fill:${tint}"/><circle cx="14.5" cy="17" r="2" style="fill:var(--ink)"/><circle cx="25.5" cy="17" r="2" style="fill:var(--ink)"/><path d="M13 26 Q20 ${curve} 27 26" style="stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round"/></svg>`;
+};
+const MOOD_LABELS = ["very low", "low", "about the same", "a little lighter", "a bit better"];
+
+/* ---------- Screens ---------- */
+const V = {};
+
+V.opening = () => {
+  const i = S.openIdx % OPENINGS.length;
+  return `<div class="opening fade-in">
+    <div>${S.opens > 0 ? `<p class="welcome">Welcome back.</p>` : `<p class="welcome">Hi there.</p>`}</div>
+    <div class="art" aria-hidden="true">${SCENES[i % SCENES.length]}</div>
+    <p class="msg">${esc(OPENINGS[i])}</p>
+    <div class="stack">
+      <button class="btn btn-primary" data-act="accept">Accept</button>
+      <button class="btn btn-soft" data-go="home">Maybe later</button>
+    </div>
+  </div>`;
+};
+
+V.home = () => {
+  const tasks = S.tasks;
+  let body;
+  if (!tasks.length) {
+    body = `<div class="empty">
+      <h1>Nothing here yet.</h1>
+      <p class="muted">Want to add one small thing?</p>
+      <button class="plus-big" data-go="add" aria-label="Add one small thing">${I.plus}</button>
+    </div>`;
+  } else {
+    body = `<h1>Today's small things</h1>
+    <div class="stack" style="gap:16px">${tasks.map(taskCard).join("")}</div>
+    <button class="btn btn-soft" data-go="add">${I.plus.replace("<svg", '<svg width="20" height="20"')}Add one small thing</button>`;
+  }
+  const done = S.doneLog.length ? `<section class="stack" style="gap:10px; margin-top:4px">
+      <p class="label">Things you did today</p>
+      <ul class="done-list">${S.doneLog.map(d => `<li>${I.leaf}<span>${esc(d.text)}</span></li>`).join("")}</ul>
+    </section>` : "";
+  return topbar(`<button class="icon-btn" data-act="how" aria-label="How Tiny Yes works">?</button>`) +
+    `<div class="screen">${body}${done}</div>`;
+};
+
+function taskCard(t) {
+  const next = t.steps.find(s => !s.done);
+  const doneCount = t.steps.filter(s => s.done).length;
+  const inner = next ? `
+      <div class="next-step">
+        <span class="label">Next small step</span>
+        <span class="text">${esc(next.text)}</span>
+      </div>
+      <button class="btn btn-primary" data-act="homeCheck" data-task="${t.id}" data-step="${next.id}">${I.check.replace("<svg", '<svg width="22" height="22"')}I did this</button>
+      <div class="quiet-links">
+        <button class="link" data-act="skip" data-task="${t.id}" data-step="${next.id}">Not this one</button>
+        <button class="link" data-act="open" data-task="${t.id}">See all steps</button>
+      </div>`
+    : `<div class="next-step"><span class="text">You did this today.</span><span class="muted small">That's enough. Really.</span></div>
+       <button class="link" data-act="open" data-task="${t.id}" style="align-self:flex-start; padding-left:0">See the steps</button>`;
+  return `<article class="card">
+    ${t.suggested ? `<span class="label">A gentle suggestion</span>` : ""}
+    <button class="task-title" data-act="open" data-task="${t.id}">${esc(t.title)}</button>
+    ${doneCount && next ? `<p class="small muted">${I.leaf.replace("<svg", '<svg width="14" height="14" style="vertical-align:-2px;color:var(--leaf)"')} ${doneCount === 1 ? "One step done already." : doneCount + " steps done already."}</p>` : ""}
+    ${inner}
+  </article>`;
+}
+
+V.add = () => `<div class="screen">
+  <button class="back" data-go="home">${I.back}Back</button>
+  <h1>What's one thing you'd like to do?</h1>
+  <form id="addForm" class="stack">
+    <label for="taskIn" class="small muted">It can be really small.</label>
+    <input id="taskIn" class="text-in" placeholder="Type here…" autocomplete="off">
+    <button class="btn btn-primary" type="submit">Next${I.arrow.replace("<svg", '<svg width="22" height="22"')}</button>
+  </form>
+  <p class="or">or say it</p>
+  <button class="mic-big" data-go="voice" aria-label="Say it out loud">${I.mic}</button>
+  <div class="stack" style="gap:10px">
+    <p class="label">Some ideas, if you like</p>
+    <div class="suggest">${["Drink some water","Go for a walk","Take a shower","Eat something","Reply to a message"].map(s => `<button class="chip" data-act="idea" data-text="${s}">${s}</button>`).join("")}</div>
+  </div>
+</div>`;
+
+V.voice = () => `<div class="voice">
+  <button class="back" data-go="add" style="align-self:flex-start">${I.back}Back</button>
+  <h1>Say what you want to do</h1>
+  <div class="wave" aria-hidden="true">${[0,.15,.3,.1,.45,.2,.35,.05,.25].map(d => `<span style="animation-delay:${d}s"></span>`).join("")}</div>
+  <p class="transcript" id="transcript" aria-live="polite">${S.voiceText ? `“${esc(S.voiceText)}”` : `<span class="muted small">Listening…</span>`}</p>
+  <button class="arrow-btn" data-act="voiceGo" aria-label="Continue">${I.arrow}</button>
+</div>`;
+
+V.split = () => {
+  const d = S.draft;
+  const steps = S.thinking
+    ? `<div class="thinking" aria-label="Breaking it into small steps"><div></div><div></div><div></div></div>`
+    : `<ul class="steps">${d.steps.map(stepRow).join("")}</ul>`;
+  return `<div class="screen">
+    <button class="back" data-act="splitBack">${I.back}Back</button>
+    <div class="orig"><span class="label">You'd like to</span><p class="t">${esc(d.title)}</p></div>
+    <p class="ai-note">${I.spark}<span>Here's one way to break it down. You can change anything.</span></p>
+    ${steps}
+    <div class="row split">
+      <button class="link" data-act="addStep" style="padding-left:0">+ Add a step</button>
+      ${d.history.length ? `<button class="link" data-act="bigger" style="padding-right:0">Bigger</button>` : ""}
+    </div>
+    <button class="btn smaller" data-act="smaller">${I.shrink}Smaller!</button>
+    ${d.isNew
+      ? `<button class="btn btn-primary" data-act="save">Save to today</button>`
+      : `<button class="btn btn-primary" data-act="splitBack">Back to today</button>
+         <button class="link" data-act="setAside">Set this aside for now</button>`}
+  </div>`;
+};
+
+function stepRow(s) {
+  const open = S.openStep === s.id;
+  const editing = S.editStep === s.id;
+  const label = editing
+    ? `<input class="edit-in" id="edit-${s.id}" value="${esc(s.text)}" aria-label="Edit step" data-edit="${s.id}">`
+    : `<span class="st">${esc(s.text)}</span>`;
+  return `<li class="step ${s.done ? "done" : ""} ${s.fresh ? "fresh" : ""}">
+    <div class="step-main">
+      <button class="check" role="checkbox" aria-checked="${s.done}" aria-label="${esc(s.text)}" data-act="splitCheck" data-step="${s.id}">${I.check}</button>
+      ${label}
+      ${editing ? `<button class="more" data-act="editDone" data-step="${s.id}" aria-label="Done editing">${I.check.replace("<svg", '<svg width="20" height="20"')}</button>`
+                : `<button class="more" data-act="stepMenu" data-step="${s.id}" aria-label="Options for this step" aria-expanded="${open}">${I.dots}</button>`}
+    </div>
+    ${open && !editing ? `<div class="step-actions">
+      <button data-act="edit" data-step="${s.id}">Edit</button>
+      <button data-act="remove" data-step="${s.id}">Remove</button>
+      <button data-act="nofit" data-step="${s.id}">This doesn't fit</button>
+    </div>` : ""}
+  </li>`;
+}
+
+V.after = () => {
+  const l = S.last || { text: "" };
+  let lower;
+  if (S.afterStage === "mood") {
+    lower = `<section class="card" style="gap:16px">
+      <h2>How do you feel now?</h2>
+      <div class="faces" role="group" aria-label="How do you feel now?">
+        ${[0,1,2,3,4].map(i => `<button class="face" data-act="mood" data-v="${i}" aria-label="${MOOD_LABELS[i]}" aria-pressed="${S.mood === i}">${face(i, 52)}</button>`).join("")}
+      </div>
+      <div class="face-labels"><span>very low</span><span>a bit better</span></div>
+      <button class="link" data-act="moodSkip">Skip</button>
+    </section>`;
+  } else {
+    lower = `<section class="card fade-in" style="gap:16px">
+      ${S.mood !== null ? `<p class="muted">Thanks for telling me.</p>` : ""}
+      <div class="px-count"><span class="dot"></span><span>You have <b>${S.pixels}</b> pixel${S.pixels === 1 ? "" : "s"} for your artwork.</span></div>
+      <button class="btn btn-earth" data-go="gallery">Add to my artwork</button>
+      <button class="btn btn-soft" data-go="home">Back home</button>
+    </section>`;
+  }
+  return `<div class="screen center">
+    <div class="after-hero fade-in" aria-hidden="true">${SCENES[1]}</div>
+    <div class="stack" style="text-align:center; gap:8px">
+      <h1>You did that. That's enough for now.</h1>
+      <p class="muted">${esc(l.text)}</p>
+    </div>
+    ${lower}
+  </div>`;
+};
+
+V.gallery = () => {
+  const a = S.art, pic = PICTURES[a.key];
+  const complete = a.placed.size >= 144;
+  const cells = [...Array(144).keys()].map(i => {
+    const on = a.placed.has(i);
+    return `<button class="px ${on ? "on" : ""} ${S.justPlaced.has(i) ? "pop" : ""}" data-act="px" data-i="${i}" ${on ? `style="background:${cellColor(a.key, i)}" aria-label="Placed"` : `aria-label="Empty spot"`}></button>`;
+  }).join("");
+  S.justPlaced = new Set();
+  const status = complete
+    ? `<div class="helps"><p class="big">It's finished. It's yours to keep.</p><p class="small muted">Start a new one whenever you like.</p></div>`
+    : S.pixels > 0
+      ? `<div class="px-count"><span class="dot"></span><span>${S.pixels} pixel${S.pixels === 1 ? "" : "s"} ready. Tap any soft square.</span></div>
+         <button class="btn btn-earth" data-act="autoPlace">Place them for me</button>`
+      : `<p class="muted small">Every small thing you do adds a little color here. It only ever grows.</p>`;
+  const all = [S.art, ...S.collection];
+  return topbar() + `<div class="screen">
+    <div><span class="label">Growing now</span><h1>${pic.name}</h1></div>
+    <div class="canvas-wrap"><div class="pixels">${cells}</div></div>
+    ${status}
+    <section class="stack" style="gap:12px">
+      <p class="label">Your collection</p>
+      <div class="collection">${all.map((x, idx) => `<button class="thumb ${idx === 0 ? "current" : ""}" data-act="pick" data-idx="${idx}"><canvas width="12" height="12" data-thumb="${idx}"></canvas>${PICTURES[x.key].name}<span>${idx === 0 ? "growing" : x.placed.size >= 144 ? "finished" : "resting"}</span></button>`).join("")}</div>
+      <button class="btn btn-soft" data-act="newArt">${I.plus.replace("<svg", '<svg width="20" height="20"')}Start a new one</button>
+    </section>
+  </div>`;
+};
+
+V.settings = () => {
+  const st = S.settings;
+  const helps = (() => {
+    const good = S.moods.filter(m => m.v >= 3);
+    if (good.length) return `<p class="big">You felt a bit lighter after “${esc(lower1(good[good.length - 1].text))}”.</p><p class="small muted">From this session.</p>`;
+    return `<p class="big">You often felt a bit better after going outside.</p><p class="small muted">Example. This fills in as you use the app.</p>`;
+  })();
+  return topbar() + `<div class="screen">
+    <h1>Settings</h1>
+
+    <section class="card set-group">
+      <h2>Notifications</h2>
+      <div class="toggle-row"><div><p>Little nudges</p><p class="small muted">Only kind ones. You can turn them off anytime.</p></div>
+        <button class="switch" role="switch" aria-checked="${st.notif}" aria-label="Notifications" data-act="toggle" data-k="notif"></button></div>
+      <p class="label">When</p>
+      <div class="suggest">${["Morning","Midday","Evening"].map(t => `<button class="chip" ${st.notif ? "" : "disabled"} aria-pressed="${st.times.includes(t)}" data-act="time" data-t="${t}">${t}</button>`).join("")}</div>
+      <p class="label">Tone</p>
+      <div class="seg">${["Gentle","Just the facts","A bit cheerful"].map(t => `<button aria-pressed="${st.tone === t}" data-act="tone" data-t="${t}">${t}</button>`).join("")}</div>
+      <button class="btn btn-soft" data-go="notifs">See sample notifications</button>
+    </section>
+
+    <section class="card set-group">
+      <h2>Learning</h2>
+      <div class="toggle-row"><div><p>Let Tiny Yes learn from your tasks and mood to make better suggestions?</p></div>
+        <button class="switch" role="switch" aria-checked="${st.tracking}" aria-label="Learning from tasks and mood" data-act="toggle" data-k="tracking"></button></div>
+      <p class="small muted">It notes when you do things and how you felt. It stays private on your phone.</p>
+      ${st.tracking ? `<div class="helps fade-in"><span class="label">What helps you</span>${helps}</div>` : ""}
+    </section>
+
+    <section class="card set-group">
+      <h2>Someone you trust</h2>
+      <p class="small muted">Optional. Only shown on the “Need help now?” screen.</p>
+      <label class="field" for="cName">Name<input id="cName" data-set="contactName" value="${esc(st.contactName)}" autocomplete="off"></label>
+      <label class="field" for="cPhone">Phone<input id="cPhone" data-set="contactPhone" value="${esc(st.contactPhone)}" inputmode="tel" autocomplete="off"></label>
+    </section>
+
+    <section class="stack" style="gap:8px">
+      <p class="label">Prototype tools</p>
+      <button class="btn btn-soft" data-act="reopen">Open the app again</button>
+      <button class="btn btn-soft" data-act="clear">Show an empty Home</button>
+    </section>
+  </div>`;
+};
+
+const TONES = {
+  "Gentle": ["Want to grab something small to eat? Even one bite counts.", "Feel like standing up for a minute? No pressure.", "Your artwork has room for one more pixel, whenever you're ready."],
+  "Just the facts": ["Something small to eat, if you want.", "A minute of standing, if you feel like it.", "Your artwork has space for a pixel."],
+  "A bit cheerful": ["A little snack might feel nice. Even one bite counts.", "How about a tiny stretch? Only if you like.", "Your garden has a cozy spot waiting for a new pixel."],
+};
+V.notifs = () => `<div class="screen">
+  <button class="back" data-go="settings">${I.back}Back</button>
+  <h1>Sample notifications</h1>
+  <div class="seg">${Object.keys(TONES).map(t => `<button aria-pressed="${S.settings.tone === t}" data-act="tone" data-t="${t}">${t}</button>`).join("")}</div>
+  <div class="lock">
+    <div class="time">10:24</div>
+    ${TONES[S.settings.tone].map((m, i) => `<div class="notif"><div class="ic">t</div><div style="flex:1;min-width:0"><div class="meta"><b>Tiny Yes</b><span>${["now","1h ago","3h ago"][i]}</span></div><p>${m}</p></div></div>`).join("")}
+  </div>
+  <section class="card" style="gap:10px">
+    <p class="label">Tiny Yes never sends</p>
+    <ul class="never"><li>You haven't done anything today</li><li>Don't break your streak</li><li>You missed yesterday</li></ul>
+  </section>
+</div>`;
+
+V.support = () => {
+  const st = S.settings;
+  const contact = st.contactName || st.contactPhone
+    ? `<div class="support-card"><span class="label">Someone you trust</span><p style="font-size:19px">${esc(st.contactName || "Your contact")}</p>
+       <p class="num">${esc(st.contactPhone)}</p><a href="tel:${esc(st.contactPhone.replace(/[^\d+]/g, ""))}">Call ${esc(st.contactName || "them")}</a></div>`
+    : `<div class="support-card"><p>You can add someone you trust in Settings.</p></div>`;
+  return `<div class="screen">
+    <button class="back" data-act="supportBack">${I.back}Back</button>
+    <h1>${S.supportReason === "task" ? "Thank you for telling me. You deserve support right now." : "You don't have to handle this alone."}</h1>
+    <p class="muted">Someone can talk with you right now. It's free and private.</p>
+    <div class="support-card"><span class="label">Call or text</span><p class="num">988</p><p class="small muted">Suicide &amp; Crisis Lifeline (US). Any time, day or night.</p></div>
+    <div class="support-card"><span class="label">Text</span><p class="num">HOME to 741741</p><p class="small muted">Crisis Text Line (US).</p></div>
+    ${contact}
+    <div class="support-card"><p class="small">Outside the US? <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a> lists free lines near you.</p>
+      <p class="small muted">If you're in danger right now, call your local emergency number (911 in the US).</p></div>
+    <p class="small muted">Trusted contact is sample data in this prototype.</p>
+  </div>`;
+};
+
+/* Sheets */
+function sheetHTML() {
+  if (S.sheet === "how") return `<div class="sheet-bg" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="How Tiny Yes works">
+    <h2>How Tiny Yes works</h2>
+    <ul class="how"><li><span>1</span>Pick one small thing you'd like to do.</li><li><span>2</span>We break it into tiny steps. Make them smaller anytime.</li><li><span>3</span>Do one step if you want. That counts.</li></ul>
+    <button class="btn btn-primary" data-act="closeSheet">Okay</button></div></div>`;
+  if (S.sheet === "newArt") return `<div class="sheet-bg" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="Start a new artwork">
+    <h2>Start a new one</h2><p class="small muted">Your current picture stays in your collection, just as it is.</p>
+    <div class="stack">${Object.entries(PICTURES).map(([k, p]) => `<button class="btn btn-soft" data-act="startArt" data-k="${k}">${p.name}</button>`).join("")}</div>
+    <button class="link" data-act="closeSheet">Not now</button></div></div>`;
+  return "";
+}
+
+/* ---------- Render ---------- */
+function render() {
+  $app.innerHTML = (V[S.view] || V.home)() + sheetHTML();
+  const main = ["home", "gallery", "settings"].includes(S.view);
+  $nav.hidden = !main;
+  $nav.querySelectorAll("button").forEach(b => b.dataset.go === S.view ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
+  if (S.view === "gallery") drawThumbs();
+  if (S.editStep) { const e = document.getElementById("edit-" + S.editStep); if (e) { e.focus(); e.select(); } }
+  if (S.view === "split" && S.draft) S.draft.steps.forEach(s => delete s.fresh);
+}
+function drawThumbs() {
+  const all = [S.art, ...S.collection];
+  document.querySelectorAll("canvas[data-thumb]").forEach(c => {
+    const a = all[+c.dataset.thumb], ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, 12, 12);
+    a.placed.forEach(i => { ctx.fillStyle = cellColor(a.key, i); ctx.fillRect(i % 12, Math.floor(i / 12), 1, 1); });
+  });
+}
+
+/* ---------- Actions ---------- */
+function findTask(id) { return S.tasks.find(t => t.id === +id); }
+function findStep(id) { return S.draft.steps.find(s => s.id === +id); }
+function recordDone(text, title) {
+  S.doneLog.push({ text, title });
+  S.pixels += 3;
+}
+function startDraft(title) {
+  title = title.trim();
+  if (!title) { toast("Type a little something, or tap an idea."); return; }
+  if (CRISIS.test(title)) { S.supportReason = "task"; S.from = "home"; go("support"); return; }
+  S.draft = { id: uid++, title: title.charAt(0).toUpperCase() + title.slice(1), steps: splitTask(title), history: [], isNew: true };
+  S.openStep = S.editStep = null; S.thinking = true;
+  go("split");
+  setTimeout(() => { S.thinking = false; S.draft.steps.forEach(s => s.fresh = true); render(); }, 650);
+}
+const snapshot = steps => steps.map(s => ({ ...s }));
+
+const ACT = {
+  accept() { toast("Kept for you."); go("home"); },
+  how() { S.sheet = "how"; render(); },
+  closeSheet() { S.sheet = null; render(); },
+  support() { S.supportReason = null; S.from = S.view; go("support"); },
+  supportBack() { go(["gallery", "settings"].includes(S.from) ? S.from : "home"); },
+  idea(e, el) { startDraft(el.dataset.text); },
+  voiceGo() { startDraft(S.voiceText || "Go for a walk"); },
+  homeCheck(e, el) {
+    const t = findTask(el.dataset.task), s = t.steps.find(x => x.id === +el.dataset.step);
+    s.done = true; recordDone(s.text, t.title);
+    const allDone = t.steps.every(x => x.done);
+    S.last = { text: allDone ? `“${t.title}”, all of it.` : `Done: ${s.text}` };
+    S.afterStage = "mood"; S.mood = null; go("after");
+  },
+  skip(e, el) {
+    const t = findTask(el.dataset.task), i = t.steps.findIndex(x => x.id === +el.dataset.step);
+    const left = t.steps.filter(x => !x.done);
+    if (left.length > 1) { const [s] = t.steps.splice(i, 1); t.steps.push(s); toast("Sure. Here's another one."); }
+    else toast("That's okay. It'll be here if you want it.");
+    render();
+  },
+  open(e, el) { const t = findTask(el.dataset.task); S.draft = Object.assign(t, { isNew: false }); S.openStep = S.editStep = null; go("split"); },
+  splitBack() { S.draft && !S.draft.isNew ? go("home") : go("add"); },
+  setAside() { S.tasks = S.tasks.filter(t => t !== S.draft); toast("Set aside. No problem."); go("home"); },
+  splitCheck(e, el) {
+    const s = findStep(el.dataset.step);
+    s.done = !s.done;
+    if (s.done) { recordDone(s.text, S.draft.title); toast("That counts. 3 pixels for your artwork."); }
+    else {
+      const k = S.doneLog.map(d => d.text).lastIndexOf(s.text);
+      if (k > -1) S.doneLog.splice(k, 1);
+      S.pixels = Math.max(0, S.pixels - 3);
+    }
+    render();
+  },
+  stepMenu(e, el) { S.openStep = S.openStep === +el.dataset.step ? null : +el.dataset.step; render(); },
+  edit(e, el) { S.editStep = +el.dataset.step; S.openStep = null; render(); },
+  editDone() { commitEdit(); },
+  remove(e, el) {
+    if (S.draft.steps.length <= 1) { toast("Let's keep at least one step."); return; }
+    S.draft.steps = S.draft.steps.filter(s => s.id !== +el.dataset.step); S.openStep = null; render();
+  },
+  nofit(e, el) {
+    const s = findStep(el.dataset.step);
+    const alt = ALTS[s.text] || GENERIC_ALTS.find(g => g !== s.text);
+    s.text = alt; s.fresh = true; s.atom = !SMALLER[alt]; S.openStep = null;
+    toast("Thanks, I'll adjust."); render();
+  },
+  addStep() { const s = mk("New step"); S.draft.steps.push(s); S.editStep = s.id; render(); },
+  smaller() {
+    const d = S.draft, before = snapshot(d.steps); let changed = false;
+    const out = [];
+    d.steps.forEach(s => { const r = smallerOf(s); if (r) { changed = true; out.push(...r); } else out.push(s); });
+    if (!changed) { toast("These are already really small. That's okay."); return; }
+    d.history.push(before); d.steps = out; S.openStep = S.editStep = null; render();
+  },
+  bigger() { const d = S.draft; if (!d.history.length) return; d.steps = d.history.pop(); render(); },
+  save() {
+    const d = S.draft; d.isNew = false; S.tasks.push(d); S.draft = null;
+    toast("Saved to today."); go("home");
+  },
+  mood(e, el) {
+    const v = +el.dataset.v; S.mood = v;
+    S.moods.push({ v, text: (S.last && S.last.text || "").replace(/^Done: /, "").replace(/^“|”, all of it\.$/g, "") });
+    S.afterStage = "art"; render();
+  },
+  moodSkip() { S.mood = null; S.afterStage = "art"; render(); },
+  px(e, el) {
+    const i = +el.dataset.i;
+    if (S.art.placed.has(i)) return;
+    if (S.pixels <= 0) { toast("This spot is saved for a future pixel."); return; }
+    placePixel(i);
+  },
+  autoPlace() {
+    let n = S.pixels;
+    while (n-- > 0) {
+      const empty = [...Array(144).keys()].filter(i => !S.art.placed.has(i));
+      if (!empty.length) break;
+      const near = empty.filter(i => [i - 12, i + 12, i % 12 ? i - 1 : -1, i % 12 < 11 ? i + 1 : -1].some(j => S.art.placed.has(j)));
+      const pool = near.length ? near : empty;
+      placePixel(pool[Math.floor(Math.random() * pool.length)], true);
+    }
+    render();
+  },
+  pick(e, el) {
+    const idx = +el.dataset.idx; if (!idx) return;
+    const [chosen] = S.collection.splice(idx - 1, 1);
+    S.collection.unshift(S.art); S.art = chosen; render();
+  },
+  newArt() { S.sheet = "newArt"; render(); },
+  startArt(e, el) { S.collection.unshift(S.art); S.art = { key: el.dataset.k, placed: new Set() }; S.sheet = null; toast("A fresh canvas. No rush."); render(); },
+  toggle(e, el) { const k = el.dataset.k; S.settings[k] = !S.settings[k]; render(); },
+  time(e, el) { const t = el.dataset.t, a = S.settings.times; a.includes(t) ? a.splice(a.indexOf(t), 1) : a.push(t); render(); },
+  tone(e, el) { S.settings.tone = el.dataset.t; render(); },
+  reopen() { S.opens++; S.openIdx++; go("opening"); },
+  clear() { S.tasks = []; go("home"); },
+};
+
+function placePixel(i, quiet) {
+  S.art.placed.add(i); S.pixels--; S.justPlaced.add(i);
+  if (S.art.placed.size >= 144) toast("Your picture is finished.");
+  if (!quiet) render();
+}
+function commitEdit() {
+  const inp = document.querySelector("[data-edit]");
+  if (inp) { const s = findStep(inp.dataset.edit); const v = inp.value.trim(); if (v) { s.text = v; s.atom = false; } }
+  S.editStep = null; render();
+}
+
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act],[data-go]");
+  if (!el) return;
+  if (el.dataset.act === "closeSheet" && el.classList.contains("sheet-bg") && e.target !== el) return;
+  if (el.dataset.go) { if (el.dataset.go === "voice") { S.voiceText = ""; setTimeout(() => { if (S.view === "voice") { S.voiceText = "Go for a walk"; const t = document.getElementById("transcript"); if (t) t.textContent = "“Go for a walk”"; } }, 1800); } go(el.dataset.go); return; }
+  const fn = ACT[el.dataset.act]; if (fn) fn(e, el);
+});
+document.addEventListener("submit", e => { e.preventDefault(); if (e.target.id === "addForm") startDraft(document.getElementById("taskIn").value); });
+document.addEventListener("keydown", e => {
+  if (e.target.matches("[data-edit]") && e.key === "Enter") { e.preventDefault(); commitEdit(); }
+  if (e.key === "Escape" && S.sheet) { S.sheet = null; render(); }
+});
+document.addEventListener("input", e => { const k = e.target.dataset.set; if (k) S.settings[k] = e.target.value; });
+
+render();
+</script>
